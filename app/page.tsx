@@ -113,11 +113,8 @@ export default function Home() {
       {/* Topbar */}
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-(--color-border-tertiary) px-6">
         <div className="flex items-center gap-2.5">
-          <Image src="/logo.png" alt="Kisku.online" width={28} height={28} className="rounded-[8px]" />
-          <span className="text-[13px] tracking-[-0.01em]">
-            <span className="font-medium text-(--color-text-primary)">Kisku</span>
-            <span className="font-[400] text-(--color-text-tertiary)">.online</span>
-          </span>
+          <Image src="/logo.png" alt="Kisku.online" width={120} height={40} className="rounded-[8px]" />
+          
           <div className="h-4 w-px bg-(--color-border-tertiary)" />
           <button
             onClick={() => setConfirmOpen(true)}
