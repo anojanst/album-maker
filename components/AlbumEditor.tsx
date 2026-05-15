@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { CheckIcon, CaretLeftIcon, CircleNotchIcon, ArrowsOutIcon, MagnifyingGlassPlusIcon, PlusIcon } from '@phosphor-icons/react'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
-import type { PhotoState, AlbumConfig, BorderState, TextLayer } from '@/types/album'
+import type { PhotoState, AlbumConfig, BorderState, TextLayer, ExportType } from '@/types/album'
 import { PRINT_SIZES } from '@/lib/printSizes'
 import { exportPhoto, exportAllAsPdf } from '@/lib/canvasExport'
 import { checkResolution } from '@/lib/resolutionCheck'
@@ -23,7 +23,6 @@ const FormatPicker = dynamic(() => import('@/components/FormatPicker'), { ssr: f
 const PhotoEditor = dynamic(() => import('@/components/PhotoEditor'), { ssr: false })
 
 type Step = 1 | 2 | 3 | 4
-export type ExportType = 'png' | 'zip' | 'pdf'
 
 const STEPS = [
   { n: 1, label: 'Upload' },

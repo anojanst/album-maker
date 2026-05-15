@@ -48,3 +48,5 @@ export interface AlbumConfig {
   printSizeId: string;
   orientation: Orientation;
 }
+
+export type ExportType = 'png' | 'zip' | 'pdf'

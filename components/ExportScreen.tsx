@@ -1,8 +1,7 @@
 'use client'
 
 import { WarningIcon, ArchiveIcon, ImageIcon, FilePdfIcon } from '@phosphor-icons/react'
-import type { PhotoState, PrintSize, Orientation } from '@/types/album'
-import type { ExportType } from '@/app/page'
+import type { PhotoState, PrintSize, Orientation, ExportType } from '@/types/album'
 
 const FORMAT_CARDS: { type: ExportType; label: string; subtitle: string; Icon: React.ElementType }[] = [
   { type: 'png', label: 'Photo (PNG)', subtitle: 'Current photo only · best quality', Icon: ImageIcon },
