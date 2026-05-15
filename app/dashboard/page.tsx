@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { PlusIcon, CircleNotchIcon } from '@phosphor-icons/react'
+import { PlusIcon, CircleNotchIcon, SignOutIcon } from '@phosphor-icons/react'
+import { signOut } from 'next-auth/react'
 import AlbumCard from '@/components/AlbumCard'
 import DeleteAlbumModal from '@/components/DeleteAlbumModal'
 
@@ -40,12 +41,20 @@ export default function DashboardPage() {
         <a href="/">
           <Image src="/logo.png" alt="Kisku.online" width={120} height={40} className="rounded-[8px]" />
         </a>
-        <a
-          href="/album/new"
-          className="flex items-center gap-1.5 rounded-[8px] bg-navy-800 px-3.5 py-2 text-[13px] font-medium text-white transition-colors hover:bg-navy-600 active:scale-[0.98]"
-        >
-          <PlusIcon className="h-3.5 w-3.5" weight="bold" /> New album
-        </a>
+        <div className="flex items-center gap-2">
+          <a
+            href="/album/new"
+            className="flex items-center gap-1.5 rounded-[8px] bg-navy-800 px-3.5 py-2 text-[13px] font-medium text-white transition-colors hover:bg-navy-600 active:scale-[0.98]"
+          >
+            <PlusIcon className="h-3.5 w-3.5" weight="bold" /> New album
+          </a>
+          <button
+            onClick={() => signOut({ callbackUrl: '/sign-in' })}
+            className="flex items-center gap-1.5 rounded-[8px] border-[0.5px] border-(--color-border-tertiary) px-3.5 py-2 text-[13px] text-(--color-text-secondary) transition-colors hover:border-(--color-border-secondary) hover:bg-(--color-background-secondary) active:scale-[0.98]"
+          >
+            <SignOutIcon className="h-3.5 w-3.5" weight="light" /> Sign out
+          </button>
+        </div>
       </header>
 
       <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-8">
