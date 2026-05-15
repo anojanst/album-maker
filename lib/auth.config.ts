@@ -2,6 +2,7 @@ import type { NextAuthConfig } from 'next-auth'
 import Resend from 'next-auth/providers/resend'
 
 export const authConfig: NextAuthConfig = {
+  secret: process.env.AUTH_SECRET,
   pages: {
     signIn: '/sign-in',
   },
