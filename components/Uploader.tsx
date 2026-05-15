@@ -103,12 +103,12 @@ export default function Uploader({ photos, onChange }: Props) {
           <div key={photo.id} className="group relative aspect-square">
             <img
               src={photo.objectUrl}
-              alt={photo.file.name}
+              alt={photo.file?.name ?? 'Photo'}
               className="h-full w-full rounded-[8px] object-cover"
             />
             <button
               onClick={() => remove(photo.id)}
-              aria-label={`Remove ${photo.file.name}`}
+              aria-label={`Remove ${photo.file?.name ?? 'photo'}`}
               className="absolute inset-0 flex items-center justify-center rounded-[8px] bg-transparent text-transparent transition-colors group-hover:bg-black/50 group-hover:text-white"
             >
               <XIcon className="h-4 w-4" weight="light" />

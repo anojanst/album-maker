@@ -30,8 +30,9 @@ export interface TextLayer {
 
 export interface PhotoState {
   id: string;
-  file: File;
+  file?: File;
   objectUrl: string;
+  r2Key?: string;
   naturalWidth: number;
   naturalHeight: number;
   zoom: number;

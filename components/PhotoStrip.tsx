@@ -36,7 +36,7 @@ export default function PhotoStrip({ photos, currentIndex, onSelect }: Props) {
           >
             <img
               src={photo.objectUrl}
-              alt={photo.file.name}
+              alt={photo.file?.name ?? 'Photo'}
               className="h-full w-full object-cover"
             />
           </button>

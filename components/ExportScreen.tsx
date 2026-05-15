@@ -88,7 +88,7 @@ export default function ExportScreen({ photos, printSize, orientation, selectedF
       </div>
 
       {/* T&Cs */}
-      <div className="border-t border-(--color-border-tertiary) pt-4">
+      <div className="flex flex-col gap-2.5 border-t border-(--color-border-tertiary) pt-4">
         <label className="flex cursor-pointer items-start gap-2.5 text-[12px] text-(--color-text-secondary)">
           <input
             type="checkbox"
@@ -99,7 +99,14 @@ export default function ExportScreen({ photos, printSize, orientation, selectedF
           <span>
             I&apos;ve read the{' '}
             <a href="/terms" className="text-primary underline">terms &amp; conditions</a>
-            {' '}— I understand no photos are stored anywhere.
+            {' '}— when I save an album, my photos are stored securely in Cloudflare R2 and my settings are saved to the database. I can delete my albums and all data at any time from my dashboard.
+          </span>
+        </label>
+        <label className="flex cursor-pointer items-start gap-2.5 text-[12px] text-(--color-text-secondary)">
+          <input type="checkbox" className="mt-px h-3.5 w-3.5 accent-primary" />
+          <span>
+            I agree to the{' '}
+            <a href="/privacy" className="text-primary underline">privacy policy</a>.
           </span>
         </label>
       </div>

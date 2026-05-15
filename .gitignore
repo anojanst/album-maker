@@ -42,3 +42,5 @@ next-env.d.ts
 
 # test assets
 /test-photos
+
+/lib/generated/prisma
