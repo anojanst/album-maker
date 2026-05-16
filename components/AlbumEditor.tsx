@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
-import { CheckIcon, CaretLeftIcon, CircleNotchIcon, ArrowsOutIcon, MagnifyingGlassPlusIcon, PlusIcon } from '@phosphor-icons/react'
+import { CheckIcon, CaretLeftIcon, CircleNotchIcon, ArrowsOutIcon, MagnifyingGlassPlusIcon, PlusIcon, FloppyDiskIcon } from '@phosphor-icons/react'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import type { PhotoState, AlbumConfig, BorderState, TextLayer, ExportType } from '@/types/album'
@@ -184,8 +184,16 @@ export default function AlbumEditor({ albumId }: Props) {
           })}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           <span className="text-[12px] text-(--color-text-tertiary)">{photos.length > 0 ? `${photos.length} photo${photos.length === 1 ? '' : 's'}` : ''}</span>
+          {photos.length > 0 && (
+            <button
+              onClick={() => setSaveOpen(true)}
+              className="flex items-center gap-1.5 rounded-[8px] border-[0.5px] border-(--color-border-tertiary) px-2.5 py-1.5 text-[12px] text-(--color-text-secondary) transition-colors hover:border-(--color-border-secondary) hover:bg-(--color-background-secondary) active:scale-[0.98]"
+            >
+              <FloppyDiskIcon className="h-3.5 w-3.5" weight="light" /> Save
+            </button>
+          )}
           <ThemeToggle />
         </div>
       </header>

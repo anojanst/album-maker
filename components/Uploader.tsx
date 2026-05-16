@@ -2,7 +2,7 @@
 
 import { useCallback, useRef } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { PlusIcon, UploadSimpleIcon, XIcon } from '@phosphor-icons/react'
+import { PlusIcon, UploadSimpleIcon, XIcon, LockSimpleIcon } from '@phosphor-icons/react'
 import type { PhotoState } from '@/types/album'
 
 interface Props {
@@ -77,9 +77,16 @@ export default function Uploader({ photos, onChange }: Props) {
         : 'border-(--color-border-secondary) bg-(--color-background-secondary) text-(--color-text-secondary) hover:border-primary hover:bg-primary/10 hover:text-primary',
   ].join(' ')
 
+  const privacyNotice = (
+    <p className="flex items-center justify-center gap-1.5 text-[11px] text-(--color-text-tertiary)">
+      <LockSimpleIcon className="h-3 w-3 shrink-0" weight="light" />
+      Photos stay on your device unless you explicitly save your album.
+    </p>
+  )
+
   if (photos.length === 0) {
     return (
-      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center p-4 sm:p-8">
+      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center gap-4 p-4 sm:p-8">
         <div {...getRootProps()} className={zoneClass}>
           <input {...getInputProps()} />
           <div className="flex h-11 w-11 items-center justify-center rounded-[10px] bg-(--color-background-primary) shadow-sm">
@@ -92,6 +99,7 @@ export default function Uploader({ photos, onChange }: Props) {
             <p className="mt-1 text-[12px] opacity-70">Accepts any image format</p>
           </div>
         </div>
+        {privacyNotice}
       </div>
     )
   }
@@ -123,6 +131,7 @@ export default function Uploader({ photos, onChange }: Props) {
           <PlusIcon className="h-5 w-5" weight="light" />
         </div>
       </div>
+      {privacyNotice}
     </div>
   )
 }
