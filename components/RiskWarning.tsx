@@ -3,6 +3,11 @@
 import { useEffect } from 'react'
 import { WarningIcon, DownloadSimpleIcon, InfoIcon } from '@phosphor-icons/react'
 
+const DARK = '#3a1a18'
+const SUCCESS = '#2d6e3a'
+const BORDER = '#DEDEDE'
+const FG = '#525252'
+
 interface Props {
   isOpen: boolean
   warning: string | null
@@ -29,28 +34,29 @@ export default function RiskWarning({ isOpen, warning, onCancel, onConfirm }: Pr
         role="dialog"
         aria-modal="true"
         aria-labelledby="rw-title"
-        className="w-full max-w-md rounded-[16px] border-[0.5px] border-(--color-border-tertiary) bg-(--color-background-primary) p-6 shadow-xl"
+        className="w-full max-w-md rounded-[16px] p-6 shadow-xl"
+        style={{ background: '#fff', border: `2px solid ${BORDER}` }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 id="rw-title" className="text-[18px] font-medium tracking-[-0.02em] text-(--color-text-primary)">
+        <h2 id="rw-title" className="text-[18px] font-semibold" style={{ color: DARK }}>
           Before you download
         </h2>
 
-        <ul className="mt-4 space-y-3 text-[13px] text-(--color-text-secondary)">
+        <ul className="mt-4 space-y-3 text-[13px]" style={{ color: FG }}>
           <li className="flex items-start gap-3">
-            <InfoIcon className="mt-0.5 h-4 w-4 shrink-0 text-primary" weight="light" />
+            <InfoIcon className="mt-0.5 h-4 w-4 shrink-0" style={{ color: DARK }} weight="light" />
             <span>
               Colour profiles may vary between your screen and printer — printed colours may look different from what you see.
             </span>
           </li>
           {warning && (
             <li className="flex items-start gap-3">
-              <WarningIcon className="mt-0.5 h-4 w-4 shrink-0 text-(--color-text-warning)" weight="light" />
-              <span>{warning}</span>
+              <WarningIcon className="mt-0.5 h-4 w-4 shrink-0" style={{ color: '#7a5a00' }} weight="light" />
+              <span style={{ color: '#7a5a00' }}>{warning}</span>
             </li>
           )}
           <li className="flex items-start gap-3">
-            <DownloadSimpleIcon className="mt-0.5 h-4 w-4 shrink-0 text-pteal-600" weight="light" />
+            <DownloadSimpleIcon className="mt-0.5 h-4 w-4 shrink-0" style={{ color: SUCCESS }} weight="light" />
             <span>
               We recommend <strong>PNG</strong> for the best print quality. PDF is convenient for multi-photo orders.
             </span>
@@ -60,13 +66,15 @@ export default function RiskWarning({ isOpen, warning, onCancel, onConfirm }: Pr
         <div className="mt-6 flex justify-end gap-3">
           <button
             onClick={onCancel}
-            className="rounded-[8px] border-[0.5px] border-(--color-border-tertiary) px-4 py-2 text-[13px] text-(--color-text-secondary) transition-colors hover:border-(--color-border-secondary) hover:bg-(--color-background-secondary)"
+            className="rounded-[10px] px-4 py-2 text-[13px] transition-colors"
+            style={{ border: `2px solid ${BORDER}`, color: FG, background: '#fff' }}
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="rounded-[8px] bg-pteal-600 px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-pteal-400 active:scale-[0.98]"
+            className="rounded-[10px] px-4 py-2 text-[13px] font-semibold text-white transition-colors active:scale-[0.98]"
+            style={{ background: SUCCESS }}
           >
             Download anyway
           </button>

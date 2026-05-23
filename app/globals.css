@@ -58,9 +58,33 @@
   --shadow-opacity: var(--shadow-opacity);
   --color-shadow-color: var(--shadow-color);
   --color-destructive-foreground: var(--destructive-foreground);
+
+  /* Kisku brand palette — used by redesigned components */
+  --color-navy-50: #FDECEA;
+  --color-navy-100: #F4B8B0;
+  --color-navy-200: #e8a09a;
+  --color-navy-600: #5a2a26;
+  --color-navy-800: #3a1a18;
+  --color-navy-900: #2a1210;
+  --color-pteal-400: #3d8f4e;
+  --color-pteal-600: #2d6e3a;
 }
 
 :root {
+  /* Semantic tokens — consumed by components via bg-(--color-*) etc. */
+  --color-background-primary: var(--background);
+  --color-background-secondary: var(--card);
+  --color-background-tertiary: var(--muted);
+  --color-border-primary: var(--ring);
+  --color-border-secondary: var(--input);
+  --color-border-tertiary: var(--border);
+  --color-text-primary: var(--foreground);
+  --color-text-secondary: var(--card-foreground);
+  --color-text-tertiary: var(--muted-foreground);
+  --color-background-warning: #FFF8E1;
+  --color-border-warning: #F5C842;
+  --color-text-warning: #7a5a00;
+
   --background: oklch(0.9809 0.0025 228.7836);
   --foreground: oklch(0.3211 0 0);
   --card: oklch(1.0000 0 0);
