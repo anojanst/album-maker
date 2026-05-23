@@ -36,7 +36,7 @@ export default function FormatPicker({ config, onChange }: Props) {
       {/* FORMAT GRID */}
       <div>
         <p className={SUBLABEL} style={{ color: FG_LIGHT }}>SIZE</p>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
           {PRINT_SIZES.map((size: PrintSize) => {
             const selected = size.id === printSizeId
             const rect = PROP_RECTS[size.id] ?? { w: 24, h: 24 }

@@ -86,7 +86,8 @@ export default function Uploader({ photos, onChange }: Props) {
             </div>
             <div>
               <p className="text-[15px] font-semibold" style={{ color: DARK }}>
-                Tap to choose photos
+                <span className="md:hidden">Tap to choose photos</span>
+                <span className="hidden md:inline">Drop photos here or click to browse</span>
               </p>
               <p className="mt-1 text-[12px]" style={{ color: FG_LIGHT }}>
                 JPEG · PNG · HEIC · up to 50 files
@@ -100,7 +101,7 @@ export default function Uploader({ photos, onChange }: Props) {
 
   return (
     <div className="flex flex-col gap-3 px-4 py-4">
-      <div className="grid grid-cols-4 gap-1.5">
+      <div className="grid grid-cols-4 gap-1.5 md:grid-cols-6">
         {photos.map((photo) => (
           <div key={photo.id} className="relative aspect-square">
             <img
