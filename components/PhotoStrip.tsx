@@ -3,6 +3,8 @@
 import { useEffect, useRef } from 'react'
 import type { PhotoState } from '@/types/album'
 
+const DARK = '#3a1a18'
+
 interface Props {
   photos: PhotoState[]
   currentIndex: number
@@ -17,7 +19,7 @@ export default function PhotoStrip({ photos, currentIndex, onSelect }: Props) {
   }, [currentIndex])
 
   return (
-    <div className="flex shrink-0 gap-1.5 overflow-x-auto">
+    <div className="flex shrink-0 gap-1.5 overflow-x-auto pb-0.5">
       {photos.map((photo, i) => {
         const active = i === currentIndex
         return (
@@ -25,12 +27,14 @@ export default function PhotoStrip({ photos, currentIndex, onSelect }: Props) {
             key={photo.id}
             ref={active ? activeRef : null}
             onClick={() => onSelect(i)}
-            className={[
-              'relative h-12.5 w-12.5 shrink-0 overflow-hidden rounded-[7px] border-2 transition-all focus-visible:outline-none',
-              active
-                ? 'border-primary'
-                : 'border-transparent opacity-60 hover:opacity-100',
-            ].join(' ')}
+            className="relative shrink-0 overflow-hidden transition-all focus-visible:outline-none"
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: 10,
+              border: active ? `2.5px solid ${DARK}` : '2.5px solid transparent',
+              opacity: active ? 1 : 0.6,
+            }}
             aria-label={`Photo ${i + 1}`}
             aria-current={active ? 'true' : undefined}
           >

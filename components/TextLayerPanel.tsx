@@ -1,6 +1,6 @@
 'use client'
 
-import { PlusIcon, PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react'
+import { PlusIcon, PencilSimpleIcon, TrashIcon, MinusIcon } from '@phosphor-icons/react'
 import type { TextLayer } from '@/types/album'
 
 export const FONTS = [
@@ -13,9 +13,12 @@ const TEXT_COLORS = [
   '#f87171', '#7dd3fc', '#86efac', '#fbbf24',
 ]
 
-const FIELD_LABEL = 'flex-1 text-[12px] text-(--color-text-secondary)'
-const NUM_INPUT = 'w-16 rounded-[6px] border-[0.5px] border-(--color-border-tertiary) bg-(--color-background-primary) px-2.5 py-1.5 text-right text-[12px] text-(--color-text-secondary) focus:outline-none focus:border-(--color-border-primary)'
-const UNIT = 'w-4 shrink-0 text-[11px] text-(--color-text-tertiary)'
+const DARK = '#3a1a18'
+const ACCENT = '#F5E642'
+const ACCENT_DARK = '#C8BB00'
+const BORDER = '#DEDEDE'
+const FG_LIGHT = '#888888'
+const BG = '#F6F5F9'
 
 interface Props {
   textLayers: TextLayer[]
@@ -46,85 +49,110 @@ export default function TextLayerPanel({ textLayers, onChange }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
+      {/* Add text button */}
       <button
         onClick={add}
-        className="flex h-7 w-full items-center justify-center gap-1.5 rounded-[7px] border-[0.5px] border-(--color-border-tertiary) bg-(--color-background-primary) text-[12px] text-(--color-text-secondary) transition-colors hover:border-(--color-border-secondary) hover:bg-(--color-background-secondary)"
+        className="flex w-full items-center justify-center gap-2 rounded-[12px] border-2 border-dashed py-4 transition-colors"
+        style={{ borderColor: BORDER, background: BG }}
       >
-        <PlusIcon className="h-3 w-3" weight="bold" /> Add text
+        <PlusIcon className="h-[18px] w-[18px]" style={{ color: DARK }} weight="bold" />
+        <span className="text-[14px] font-medium" style={{ color: DARK }}>Add text</span>
       </button>
 
+      {/* Layer list */}
       {textLayers.length > 0 && (
-        <div className="flex flex-col gap-0.5">
+        <div className="flex flex-col gap-1.5">
           {textLayers.map(layer => (
             <div
               key={layer.id}
               onClick={() => select(layer.id)}
-              className={[
-                'flex cursor-pointer items-center gap-1 rounded-[6px] px-2 py-1.5 text-[11px]',
-                layer.selected
-                  ? 'bg-navy-50 text-navy-800'
-                  : 'text-(--color-text-secondary) hover:bg-(--color-background-secondary)',
-              ].join(' ')}
+              className="flex cursor-pointer items-center gap-2 rounded-[12px] border-2 px-3 py-2.5"
+              style={{
+                borderColor: layer.selected ? DARK : BORDER,
+                background: layer.selected ? ACCENT : '#fff',
+              }}
             >
-              <PencilSimpleIcon className="h-3 w-3 shrink-0 opacity-50" weight="light" />
-              <span className="flex-1 truncate">{layer.content}</span>
+              <PencilSimpleIcon className="h-3.5 w-3.5 shrink-0" style={{ color: DARK }} weight="light" />
+              <span className="flex-1 truncate text-[12px] font-medium" style={{ color: DARK }}>
+                {layer.content}
+              </span>
               <button
                 onClick={(e) => { e.stopPropagation(); remove(layer.id) }}
-                className="shrink-0 text-(--color-text-tertiary) transition-colors hover:text-red-400"
+                className="shrink-0 transition-colors"
                 title="Delete layer"
               >
-                <TrashIcon className="h-3.5 w-3.5" weight="light" />
+                <TrashIcon className="h-4 w-4" style={{ color: FG_LIGHT }} weight="light" />
               </button>
             </div>
           ))}
         </div>
       )}
 
+      {/* Selected layer controls */}
       {selected && (
-        <div className="flex flex-col gap-2 border-t-[0.5px] border-(--color-border-tertiary) pt-2">
+        <div
+          className="flex flex-col gap-3 rounded-[12px] border-2 p-3"
+          style={{ borderColor: BORDER, background: '#fff' }}
+        >
           <input
             type="text"
             value={selected.content}
             onChange={(e) => patch({ content: e.target.value })}
-            className="w-full rounded-[6px] border-[0.5px] border-(--color-border-tertiary) bg-(--color-background-primary) px-2.5 py-1.5 text-[12px] text-(--color-text-secondary) focus:outline-none focus:border-(--color-border-primary)"
+            className="w-full rounded-[8px] border-2 px-3 py-2 text-[13px] outline-none"
+            style={{ borderColor: BORDER, color: DARK }}
             placeholder="Layer text"
           />
           <select
             value={selected.fontFamily}
             onChange={(e) => patch({ fontFamily: e.target.value })}
-            className="w-full rounded-[6px] border-[0.5px] border-(--color-border-tertiary) bg-(--color-background-primary) px-2.5 py-1.5 text-[12px] text-(--color-text-secondary) focus:outline-none"
+            className="w-full rounded-[8px] border-2 px-3 py-2 text-[12px] outline-none"
+            style={{ borderColor: BORDER, color: DARK }}
           >
             {FONTS.map(f => <option key={f} value={f}>{f}</option>)}
           </select>
+
+          {/* Size stepper */}
           <div className="flex items-center gap-2">
-            <span className={FIELD_LABEL}>Size</span>
-            <input
-              type="number"
-              min={8}
-              max={500}
-              step={4}
-              value={selected.fontSize}
-              onChange={(e) => patch({ fontSize: Math.max(8, parseInt(e.target.value) || 48) })}
-              className={NUM_INPUT}
-            />
-            <span className={UNIT}>pt</span>
+            <span className="w-10 text-[11px] font-medium uppercase tracking-wide" style={{ color: FG_LIGHT }}>Size</span>
+            <div
+              className="flex flex-1 overflow-hidden rounded-[10px] border-2"
+              style={{ background: BG, borderColor: BORDER }}
+            >
+              <button
+                onClick={() => patch({ fontSize: Math.max(8, selected.fontSize - 4) })}
+                className="flex h-10 w-10 shrink-0 items-center justify-center bg-white"
+              >
+                <MinusIcon className="h-4 w-4" style={{ color: DARK }} weight="bold" />
+              </button>
+              <div
+                className="flex flex-1 items-center justify-center border-x-2 text-[14px] font-semibold"
+                style={{ color: DARK, borderColor: BORDER }}
+              >
+                {selected.fontSize} pt
+              </div>
+              <button
+                onClick={() => patch({ fontSize: Math.min(500, selected.fontSize + 4) })}
+                className="flex h-10 w-10 shrink-0 items-center justify-center bg-white"
+              >
+                <PlusIcon className="h-4 w-4" style={{ color: DARK }} weight="bold" />
+              </button>
+            </div>
           </div>
+
+          {/* Colour swatches */}
           <div className="flex flex-wrap gap-1.5">
             {TEXT_COLORS.map(color => (
               <button
                 key={color}
                 title={color}
                 onClick={() => patch({ color })}
-                style={{ backgroundColor: color }}
-                className={[
-                  'h-[22px] w-[22px] rounded-full transition-all',
-                  selected.color === color
-                    ? 'outline-2 outline-offset-1 outline-navy-800 scale-110'
-                    : color === '#ffffff'
-                      ? 'ring-1 ring-(--color-border-tertiary) hover:scale-110'
-                      : 'hover:scale-110',
-                ].join(' ')}
+                className="h-[22px] w-[22px] rounded-full border-[2.5px] transition-all"
+                style={{
+                  backgroundColor: color,
+                  borderColor: selected.color === color ? DARK : 'transparent',
+                  boxShadow: color === '#ffffff' ? '0 0 0 1px #DEDEDE' : undefined,
+                }}
               />
             ))}
             <input

@@ -2,8 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import Image from 'next/image'
-import { CheckIcon, CaretLeftIcon, CircleNotchIcon, ArrowsOutIcon, MagnifyingGlassPlusIcon, PlusIcon, FloppyDiskIcon } from '@phosphor-icons/react'
+import {
+  CaretLeftIcon,
+  CircleNotchIcon,
+  ArrowsOutIcon,
+  MagnifyingGlassPlusIcon,
+  FloppyDiskIcon,
+  DownloadSimpleIcon,
+} from '@phosphor-icons/react'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import type { PhotoState, AlbumConfig, BorderState, TextLayer, ExportType } from '@/types/album'
@@ -11,7 +17,6 @@ import { PRINT_SIZES } from '@/lib/printSizes'
 import { exportPhoto, exportAllAsPdf } from '@/lib/canvasExport'
 import { checkResolution } from '@/lib/resolutionCheck'
 import PhotoStrip from '@/components/PhotoStrip'
-import ThemeToggle from '@/components/ThemeToggle'
 import PhotoToolPanel from '@/components/PhotoToolPanel'
 import RiskWarning from '@/components/RiskWarning'
 import ExportScreen from '@/components/ExportScreen'
@@ -24,14 +29,20 @@ const PhotoEditor = dynamic(() => import('@/components/PhotoEditor'), { ssr: fal
 
 type Step = 1 | 2 | 3 | 4
 
-const STEPS = [
-  { n: 1, label: 'Upload' },
-  { n: 2, label: 'Format' },
-  { n: 3, label: 'Adjust' },
-  { n: 4, label: 'Export' },
-] as const
-
 const R2_URL = process.env.NEXT_PUBLIC_R2_PUBLIC_URL ?? ''
+
+// Kisku / Candyland palette
+const DARK = '#3a1a18'
+const PRIMARY = '#F4B8B0'
+const SECONDARY = '#A8D4E8'
+const BG = '#F6F5F9'
+const SUCCESS = '#2d6e3a'
+
+const STEP_LABELS: Record<number, string> = {
+  1: 'Choose format →',
+  2: 'Adjust photos →',
+  3: 'Download →',
+}
 
 interface Props {
   albumId?: string
@@ -83,6 +94,9 @@ export default function AlbumEditor({ albumId }: Props) {
   const activeIdx = photos.findIndex((p) => p.id === activeId)
   const activePhoto = photos[activeIdx] ?? null
   const printSize = PRINT_SIZES.find((s) => s.id === config.printSizeId) ?? PRINT_SIZES[0]
+
+  const isFirst = activeIdx <= 0
+  const isLast = activeIdx >= photos.length - 1
 
   function handlePhotoChange(updated: PhotoState) {
     setPhotos((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))
@@ -140,102 +154,167 @@ export default function AlbumEditor({ albumId }: Props) {
   }
 
   const canContinue = step === 1 ? photos.length > 0 : step === 4 ? termsAccepted && !exporting : true
-  const primaryLabel = exporting ? 'Exporting…' : step === 4 ? `Download ${photos.length} photo${photos.length === 1 ? '' : 's'}` : 'Continue →'
+  const primaryLabel = exporting
+    ? 'Exporting…'
+    : step === 4
+      ? `Download ${photos.length} photo${photos.length === 1 ? '' : 's'}`
+      : STEP_LABELS[step]
+
+  const heroBg = step === 4 ? SECONDARY : PRIMARY
+  const heroTextColor = step === 4 ? '#1a2a3a' : DARK
+  const heroSubColor = step === 4 ? '#2a5a6a' : '#7a3a35'
+  const backBorderColor = step === 4 ? '#1a4a5a' : DARK
 
   if (loadingAlbum) {
     return (
-      <div className="flex h-screen items-center justify-center bg-(--color-background-primary)">
-        <CircleNotchIcon className="h-7 w-7 animate-spin text-(--color-text-tertiary)" weight="light" />
+      <div className="flex h-screen items-center justify-center" style={{ background: BG }}>
+        <CircleNotchIcon className="h-7 w-7 animate-spin" style={{ color: DARK }} weight="light" />
       </div>
     )
   }
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-(--color-background-primary)">
-      <header className="flex h-14 shrink-0 items-center justify-between border-b border-(--color-border-tertiary) px-6">
-        <div className="flex items-center gap-2.5">
-          <a href="/dashboard">
-            <Image src="/logo.png" alt="Kisku.online" width={120} height={40} className="rounded-[8px]" />
-          </a>
-          <div className="h-4 w-px bg-(--color-border-tertiary)" />
-          <button
-            onClick={() => setConfirmOpen(true)}
-            className="flex items-center gap-1 rounded-[8px] border-[0.5px] border-(--color-border-tertiary) px-2.5 py-1.5 text-[12px] text-(--color-text-secondary) transition-colors hover:border-(--color-border-secondary) hover:bg-(--color-background-secondary) active:scale-[0.98]"
-          >
-            <PlusIcon className="h-3 w-3" weight="bold" /> New album
-          </button>
-        </div>
-
-        <nav className="flex items-center">
-          {STEPS.map(({ n, label }, i) => {
-            const active = step === n
-            const done = step > n
-            return (
-              <div key={n} className="flex items-center">
-                <div className={['flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[13px]', active ? 'bg-(--color-background-secondary)' : '', !active && !done ? 'text-(--color-text-tertiary)' : ''].join(' ')}>
-                  <div className={['flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full text-[11px]', done ? 'bg-pteal-400 text-white' : active ? 'bg-primary text-primary-foreground' : 'border border-current'].join(' ')}>
-                    {done ? <CheckIcon className="h-3 w-3" weight="bold" /> : n}
-                  </div>
-                  <span className={done ? 'text-pteal-400' : active ? 'font-medium text-primary' : ''}>{label}</span>
-                </div>
-                {i < STEPS.length - 1 && <div className="mx-1 h-px w-5 bg-(--color-border-tertiary)" />}
-              </div>
-            )
-          })}
-        </nav>
-
-        <div className="flex items-center gap-2.5">
-          <span className="text-[12px] text-(--color-text-tertiary)">{photos.length > 0 ? `${photos.length} photo${photos.length === 1 ? '' : 's'}` : ''}</span>
-          {photos.length > 0 && (
+    <div className="flex h-screen flex-col overflow-hidden" style={{ background: BG }}>
+      {/* Status bar */}
+      <div
+        className="flex h-[44px] shrink-0 items-center justify-between px-5"
+        style={{ background: heroBg }}
+      >
+        <span className="text-[13px] font-semibold" style={{ color: DARK }}>kisku</span>
+        <div className="flex items-center gap-2">
+          {photos.length > 0 && step > 1 && (
             <button
               onClick={() => setSaveOpen(true)}
-              className="flex items-center gap-1.5 rounded-[8px] border-[0.5px] border-(--color-border-tertiary) px-2.5 py-1.5 text-[12px] text-(--color-text-secondary) transition-colors hover:border-(--color-border-secondary) hover:bg-(--color-background-secondary) active:scale-[0.98]"
+              className="flex items-center gap-1 rounded-[8px] px-2.5 py-1 text-[11px] font-medium"
+              style={{ background: 'rgba(255,255,255,0.35)', color: DARK }}
             >
-              <FloppyDiskIcon className="h-3.5 w-3.5" weight="light" /> Save
+              <FloppyDiskIcon className="h-3 w-3" weight="bold" /> Save
             </button>
           )}
-          <ThemeToggle />
+          {step > 1 && (
+            <button
+              onClick={() => setConfirmOpen(true)}
+              className="text-[11px] font-medium px-2 py-1 rounded-[8px]"
+              style={{ color: DARK, background: 'rgba(255,255,255,0.25)' }}
+            >
+              New
+            </button>
+          )}
         </div>
-      </header>
+      </div>
 
-      <main className="flex flex-1 flex-col overflow-hidden">
-        {step === 1 && <Uploader photos={photos} onChange={setPhotos} />}
-        {step === 2 && <FormatPicker config={config} onChange={setConfig} />}
+      {/* Hero block */}
+      <div className="shrink-0" style={{ background: heroBg }}>
+        {/* Hero nav row */}
+        <div className="flex items-center justify-between px-4 pb-3 pt-3">
+          {step > 1 ? (
+            <button
+              onClick={goBack}
+              className="flex h-[38px] w-[38px] items-center justify-center rounded-[11px] border-2 bg-white transition-transform active:scale-[0.95]"
+              style={{ borderColor: backBorderColor }}
+            >
+              <CaretLeftIcon className="h-4 w-4" style={{ color: backBorderColor }} weight="bold" />
+            </button>
+          ) : (
+            <div className="h-[38px] w-[38px]" />
+          )}
+
+          <span className="text-[13px] font-medium" style={{ color: DARK }}>
+            {step === 3 && photos.length > 0 ? `photo ${activeIdx + 1} / ${photos.length}` : ''}
+          </span>
+
+          <div
+            className="rounded-[20px] px-3 py-[5px] text-[12px] font-medium"
+            style={{ background: 'rgba(255,255,255,0.35)', color: step === 4 ? '#2d6e3a' : DARK }}
+          >
+            {step === 4 ? '✓ ready' : `${step} / 3`}
+          </div>
+        </div>
+
+        {/* Hero title + subtitle — steps 1, 2, 4 */}
+        {step !== 3 && (
+          <div className="px-4 pb-6">
+            <h1
+              className="whitespace-pre-line text-[36px] font-semibold leading-[1.05] tracking-[-1px]"
+              style={{ color: heroTextColor }}
+            >
+              {step === 1 && 'Your photos,\nprinted.'}
+              {step === 2 && 'Print size.'}
+              {step === 4 && 'Almost\ndone.'}
+            </h1>
+            <p className="mt-2 text-[13px] leading-[1.5]" style={{ color: heroSubColor }}>
+              {step === 1 && 'Upload from your phone — everything stays in your browser'}
+              {step === 2 && `All ${photos.length} photo${photos.length === 1 ? '' : 's'} use the same size and orientation`}
+              {step === 4 && `${photos.length} photo${photos.length === 1 ? '' : 's'} · ${printSize.label} · ${config.orientation}`}
+            </p>
+          </div>
+        )}
+
+        {/* Canvas card — step 3 only */}
         {step === 3 && activePhoto && (
-          <div className="flex flex-1 flex-col overflow-hidden">
-            <div className="grid h-15 shrink-0 grid-cols-3 items-center border-b border-(--color-border-tertiary) px-5">
-              <div>
-                <p className="text-[13px] font-medium tracking-[-0.02em] text-(--color-text-primary)">{printSize.label} · {config.orientation === 'portrait' ? 'Portrait' : 'Landscape'}</p>
-                <p className="text-[11px] text-(--color-text-tertiary)">{printSize.mm.w} × {printSize.mm.h} mm · 300 DPI export</p>
+          <div className="px-4 pb-4">
+            <div
+              className="relative rounded-[18px] border-2"
+              style={{ background: '#fff', borderColor: '#DEDEDE', padding: 16 }}
+            >
+              <div style={{ height: 260, overflow: 'hidden' }}>
+                <PhotoEditor
+                  key={activePhoto.id}
+                  photo={activePhoto}
+                  size={printSize}
+                  orientation={config.orientation}
+                  onChange={handlePhotoChange}
+                />
               </div>
-              <div className="flex items-center justify-center gap-2">
-                <span className="flex items-center gap-1.5 rounded-full border-[0.5px] border-(--color-border-tertiary) bg-(--color-background-primary) px-3 py-1 text-[11px] text-(--color-text-tertiary)">
+              {/* Hint pills */}
+              <div className="mt-2 flex justify-center gap-2">
+                <span
+                  className="flex items-center gap-1.5 rounded-[20px] px-3 py-1 text-[11px] font-medium"
+                  style={{ background: 'rgba(255,255,255,0.92)', color: DARK, border: '1px solid rgba(58,26,24,0.1)' }}
+                >
                   <ArrowsOutIcon className="h-3 w-3" weight="light" /> drag to pan
                 </span>
-                <span className="flex items-center gap-1.5 rounded-full border-[0.5px] border-(--color-border-tertiary) bg-(--color-background-primary) px-3 py-1 text-[11px] text-(--color-text-tertiary)">
-                  <MagnifyingGlassPlusIcon className="h-3 w-3" weight="light" /> scroll to zoom
+                <span
+                  className="flex items-center gap-1.5 rounded-[20px] px-3 py-1 text-[11px] font-medium"
+                  style={{ background: 'rgba(255,255,255,0.92)', color: DARK, border: '1px solid rgba(58,26,24,0.1)' }}
+                >
+                  <MagnifyingGlassPlusIcon className="h-3 w-3" weight="light" /> pinch to zoom
                 </span>
               </div>
-              <span className="text-right text-[12px] text-(--color-text-tertiary)">Photo {activeIdx + 1} of {photos.length}</span>
             </div>
-            <div className="flex min-h-0 flex-1 gap-2 p-4 pb-1">
-              <div className="min-h-0 flex-1 overflow-hidden rounded-[12px] border-[0.5px] border-(--color-border-tertiary) bg-(--color-background-secondary) p-4">
-                <PhotoEditor key={activePhoto.id} photo={activePhoto} size={printSize} orientation={config.orientation} onChange={handlePhotoChange} />
-              </div>
-              <PhotoToolPanel
-                photo={activePhoto}
-                onChange={handlePhotoChange}
-                onPrev={() => setActiveId(photos[activeIdx - 1].id)}
-                onNext={() => setActiveId(photos[activeIdx + 1].id)}
-                isFirst={activeIdx === 0}
-                isLast={activeIdx === photos.length - 1}
-                activeIdx={activeIdx}
-                totalPhotos={photos.length}
-              />
-            </div>
-            <div className="flex h-15.5 shrink-0 items-center px-4">
-              <PhotoStrip photos={photos} currentIndex={activeIdx} onSelect={(i) => setActiveId(photos[i].id)} />
-            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Body */}
+      <main className="flex-1 overflow-y-auto" style={{ background: BG }}>
+        {step === 1 && (
+          <Uploader
+            photos={photos}
+            onChange={(p) => {
+              setPhotos(p)
+              if (p.length > 0 && !activeId) setActiveId(p[0].id)
+            }}
+          />
+        )}
+        {step === 2 && <FormatPicker config={config} onChange={setConfig} />}
+        {step === 3 && activePhoto && (
+          <div className="flex flex-col gap-3 px-4 py-4">
+            <PhotoStrip
+              photos={photos}
+              currentIndex={activeIdx}
+              onSelect={(i) => setActiveId(photos[i].id)}
+            />
+            <PhotoToolPanel
+              photo={activePhoto}
+              onChange={handlePhotoChange}
+              onPrev={() => { if (!isFirst) setActiveId(photos[activeIdx - 1].id) }}
+              onNext={() => { if (!isLast) setActiveId(photos[activeIdx + 1].id) }}
+              isFirst={activeIdx === 0}
+              isLast={activeIdx === photos.length - 1}
+              activeIdx={activeIdx}
+              totalPhotos={photos.length}
+            />
           </div>
         )}
         {step === 4 && (
@@ -251,13 +330,16 @@ export default function AlbumEditor({ albumId }: Props) {
         )}
       </main>
 
-      <footer className="flex h-13 shrink-0 items-center justify-between border-t border-(--color-border-tertiary) px-6">
-        <button onClick={goBack} disabled={step === 1} className="flex items-center gap-1 rounded-[8px] border-[0.5px] border-(--color-border-tertiary) px-3 py-2 text-[13px] text-(--color-text-secondary) transition-colors hover:border-(--color-border-secondary) hover:bg-(--color-background-secondary) disabled:pointer-events-none disabled:opacity-0">
-          <CaretLeftIcon className="h-3.5 w-3.5" weight="light" /> Back
-        </button>
-        <span className="text-[12px] text-(--color-text-tertiary)">Step {step} of 4</span>
-        <button onClick={goNext} disabled={!canContinue} className={['flex items-center gap-1.5 rounded-[8px] px-5 py-2 text-[13px] font-medium text-white transition-colors active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40', step === 4 ? 'bg-pteal-600 hover:bg-pteal-400' : 'bg-primary hover:bg-primary/90'].join(' ')}>
-          {exporting && <CircleNotchIcon className="h-3.5 w-3.5 animate-spin" weight="light" />}
+      {/* Footer */}
+      <footer className="shrink-0 px-4 pb-6 pt-2.5" style={{ background: BG }}>
+        <button
+          onClick={goNext}
+          disabled={!canContinue}
+          className="flex h-[54px] w-full items-center justify-center gap-2 rounded-[16px] text-[16px] font-semibold text-white transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+          style={{ background: step === 4 ? SUCCESS : DARK }}
+        >
+          {exporting && <CircleNotchIcon className="h-4 w-4 animate-spin" weight="light" />}
+          {step === 4 && !exporting && <DownloadSimpleIcon className="h-4 w-4" style={{ color: '#7FE4A0' }} weight="bold" />}
           {primaryLabel}
         </button>
       </footer>

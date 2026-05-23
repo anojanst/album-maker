@@ -188,7 +188,7 @@ export default function PhotoEditor({ photo, size, orientation, onChange }: Prop
                 ref={trRef}
                 rotateEnabled={false}
                 enabledAnchors={[]}
-                borderStroke="#0C447C"
+                borderStroke="#3a1a18"
                 borderStrokeWidth={1.5}
               />
             </Layer>

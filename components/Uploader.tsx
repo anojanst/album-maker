@@ -2,8 +2,13 @@
 
 import { useCallback, useRef } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { PlusIcon, UploadSimpleIcon, XIcon, LockSimpleIcon } from '@phosphor-icons/react'
+import { PlusIcon, UploadSimpleIcon, XIcon } from '@phosphor-icons/react'
 import type { PhotoState } from '@/types/album'
+
+const DARK = '#3a1a18'
+const ACCENT = '#F5E642'
+const BORDER = '#DEDEDE'
+const FG_LIGHT = '#888888'
 
 interface Props {
   photos: PhotoState[]
@@ -41,22 +46,14 @@ export default function Uploader({ photos, onChange }: Props) {
         panY: 0,
         rotation: 0,
         flipH: false,
-        border: {
-          mode: 'uniform',
-          uniform: 0,
-          top: 0,
-          right: 0,
-          bottom: 0,
-          left: 0,
-          color: '#ffffff',
-        },
+        border: { mode: 'uniform', uniform: 0, top: 0, right: 0, bottom: 0, left: 0, color: '#F5E642' },
         textLayers: [],
       })
     }
     onChangeRef.current([...photosRef.current, ...added])
   }, [])
 
-  const { getRootProps, getInputProps, isDragActive, isDragReject } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: { 'image/*': [] },
     multiple: true,
@@ -68,70 +65,83 @@ export default function Uploader({ photos, onChange }: Props) {
     onChangeRef.current(photosRef.current.filter((p) => p.id !== id))
   }
 
-  const zoneClass = [
-    'flex cursor-pointer flex-col items-center justify-center gap-4 rounded-[12px] border border-dashed p-8 text-center transition-colors sm:p-12',
-    isDragReject
-      ? 'border-red-400 bg-red-50 text-red-500'
-      : isDragActive
-        ? 'border-primary bg-primary/10 text-primary'
-        : 'border-(--color-border-secondary) bg-(--color-background-secondary) text-(--color-text-secondary) hover:border-primary hover:bg-primary/10 hover:text-primary',
-  ].join(' ')
-
-  const privacyNotice = (
-    <p className="flex items-center justify-center gap-1.5 text-[11px] text-(--color-text-tertiary)">
-      <LockSimpleIcon className="h-3 w-3 shrink-0" weight="light" />
-      Photos stay on your device unless you explicitly save your album.
-    </p>
-  )
-
   if (photos.length === 0) {
     return (
-      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center gap-4 p-4 sm:p-8">
-        <div {...getRootProps()} className={zoneClass}>
+      <div className="flex flex-1 flex-col items-center justify-center px-4 py-8">
+        <div
+          {...getRootProps()}
+          className="w-full cursor-pointer rounded-[18px] px-4 py-7 text-center transition-colors"
+          style={{
+            border: `2.5px solid ${isDragActive ? ACCENT : DARK}`,
+            background: isDragActive ? '#FFFDE0' : '#fff',
+          }}
+        >
           <input {...getInputProps()} />
-          <div className="flex h-11 w-11 items-center justify-center rounded-[10px] bg-(--color-background-primary) shadow-sm">
-            <UploadSimpleIcon className="h-5 w-5" weight="light" />
-          </div>
-          <div>
-            <p className="text-[14px] font-medium">
-              {isDragActive ? 'Drop photos here' : 'Drop photos here or click to browse'}
-            </p>
-            <p className="mt-1 text-[12px] opacity-70">Accepts any image format</p>
+          <div className="flex flex-col items-center gap-3">
+            <div
+              className="flex h-[52px] w-[52px] items-center justify-center"
+              style={{ borderRadius: 15, background: ACCENT }}
+            >
+              <UploadSimpleIcon className="h-6 w-6" style={{ color: DARK }} weight="bold" />
+            </div>
+            <div>
+              <p className="text-[15px] font-semibold" style={{ color: DARK }}>
+                Tap to choose photos
+              </p>
+              <p className="mt-1 text-[12px]" style={{ color: FG_LIGHT }}>
+                JPEG · PNG · HEIC · up to 50 files
+              </p>
+            </div>
           </div>
         </div>
-        {privacyNotice}
       </div>
     )
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 overflow-y-auto p-4 sm:p-8">
-      <div className="grid grid-cols-7 gap-1.5">
+    <div className="flex flex-col gap-3 px-4 py-4">
+      <div className="grid grid-cols-4 gap-1.5">
         {photos.map((photo) => (
-          <div key={photo.id} className="group relative aspect-square">
+          <div key={photo.id} className="relative aspect-square">
             <img
               src={photo.objectUrl}
               alt={photo.file?.name ?? 'Photo'}
-              className="h-full w-full rounded-[8px] object-cover"
+              className="h-full w-full object-cover"
+              style={{ borderRadius: 12 }}
             />
             <button
               onClick={() => remove(photo.id)}
               aria-label={`Remove ${photo.file?.name ?? 'photo'}`}
-              className="absolute inset-0 flex items-center justify-center rounded-[8px] bg-transparent text-transparent transition-colors group-hover:bg-black/50 group-hover:text-white"
+              className="absolute right-1 top-1 flex items-center justify-center"
+              style={{
+                width: 17,
+                height: 17,
+                borderRadius: '50%',
+                background: 'rgba(58,26,24,0.55)',
+              }}
             >
-              <XIcon className="h-4 w-4" weight="light" />
+              <XIcon className="h-[9px] w-[9px] text-white" weight="bold" />
             </button>
           </div>
         ))}
+        {/* Add more tile */}
         <div
           {...getRootProps()}
-          className="aspect-square cursor-pointer flex items-center justify-center rounded-[8px] border border-dashed border-(--color-border-secondary) text-(--color-text-tertiary) transition-colors hover:border-primary hover:bg-primary/10 hover:text-primary"
+          className="relative aspect-square cursor-pointer flex items-center justify-center transition-colors"
+          style={{
+            borderRadius: 12,
+            border: `2px dashed ${BORDER}`,
+            background: '#fff',
+          }}
         >
           <input {...getInputProps()} />
-          <PlusIcon className="h-5 w-5" weight="light" />
+          <PlusIcon className="h-5 w-5" style={{ color: FG_LIGHT }} weight="bold" />
         </div>
       </div>
-      {privacyNotice}
+
+      <p className="text-center text-[12px]" style={{ color: FG_LIGHT }}>
+        {photos.length} photo{photos.length === 1 ? '' : 's'} selected
+      </p>
     </div>
   )
 }

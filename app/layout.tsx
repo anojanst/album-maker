@@ -6,7 +6,7 @@ import "./globals.css";
 const poppins = Poppins({
   variable: "--font-sans",
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["400", "500", "600"],
 });
 
 const geistMono = Geist_Mono({
